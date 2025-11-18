@@ -1,146 +1,124 @@
-# Production KPI Dashboard – VBA to Python Migration
+# Production KPI Dashboard – VBA から Python への移行
 
-Overview
+### Dashboard View
+![Dashboard](screenshots/Screenshot_18-11-2025_135355_localhost.jpeg)
 
-This repository demonstrates a migration from an Excel VBA-based KPI reporting tool to a modern Python web application using Streamlit. It simulates a manufacturing company's internal dashboard for production management, quality control, and operations reporting.
 
-**NEW: Full bilingual support (English + 日本語)!**
+### Data Visualization
+![Data plot](screenshots/Screenshot_18-11-2025_135434_localhost.jpeg)
 
-Features
+### Filtered Data
+![Filtered Data](screenshots/Screenshot_18-11-2025_135814_localhost.jpeg)
 
-- Legacy Excel VBA automation for KPI reporting (VBA modules included)
-- Streamlit-based Python application with modular structure
-- ✨ **Bilingual UI: English + Japanese (日本語)** with instant language switching
-- File upload (.xlsx) and sample data generator
-- Filter options (date range, machine, shift)
-- KPI cards, charts (matplotlib), data table, and export options
-- Language selector in sidebar for easy switching
+概要
 
-Screenshots
+このリポジトリは、Excel の VBA ベースの KPI レポーティングツールを Streamlit を用いたモダンな Python ウェブアプリへ移行した例を示します。製造業の現場で使われる内部ダッシュボードを模し、生産管理、品質管理、運用報告のユースケースを想定しています。
 
-- screenshot_kpi_cards.png (placeholder)
-- screenshot_charts.png (placeholder)
-- screenshot_table.png (placeholder)
+特徴
 
-How to run the VBA version
+- レガシーな Excel VBA による自動化（VBA モジュールを同梱）
+- モジュール化された Streamlit ベースの Python アプリ
+- ファイルアップロード（.xlsx）とサンプルデータ生成スクリプト
+- フィルター（期間、機械、シフト）
+- KPI カード、チャート（matplotlib）、データテーブル、エクスポート機能
+- 英語／日本語のバイリンガル対応（サイドバーの言語切替）
 
-1. Open the Excel workbook containing the `production_data` sheet and import the VBA modules:
+
+
+VBA 版の実行方法
+
+1. `production_data` シートを含む Excel ブックを開き、以下の VBA モジュールをインポートします:
    - `ProductionKPITool.bas`
    - `Helpers.bas`
-   - Import the `UserForm.frm` into the VBA editor (or recreate form controls).
-2. Ensure the workbook has sheets named `production_data` and `kpi_dashboard`.
-3. Run the `RunProductionKPI` macro (or assign to a button).
+   - `UserForm.frm`（VBA エディタにインポートするか、同等のフォームを作成してください）
+2. ワークブックに `production_data` と `kpi_dashboard` という名前のシートが存在することを確認します。
+3. `RunProductionKPI` マクロを実行するか、ボタンに割り当てて実行します。
 
-How to run the Python version
+Python 版の実行方法
 
-Prerequisites
+必要条件
 
-- Python 3.9+ (3.10 recommended)
-- Create and activate virtual environment
+- Python 3.9+（3.10 推奨）
+- 仮想環境の作成と有効化
 
-Install dependencies:
+依存パッケージのインストール（PowerShell の例）:
 
 ```powershell
 python -m venv .venv; .venv\Scripts\Activate.ps1; pip install -U pip
 pip install pandas streamlit matplotlib openpyxl
 ```
 
-Generate sample data (optional but recommended):
+サンプルデータの生成（任意だが推奨）:
 
 ```powershell
 python python_app/data/generate_sample_data.py
 ```
 
-Run the Streamlit app:
+Streamlit アプリの起動:
 
 ```powershell
 cd python_app
 streamlit run app.py
 ```
 
-**Bilingual Support:** Once the app launches, use the language selector in the sidebar to switch between English and 日本語 (Japanese).
+アプリが起動したら、サイドバー上部の言語セレクタで英語（English）または日本語（日本語）を選択できます。切り替えは即時反映されます。
 
-Project structure
+プロジェクト構成
 
 ```
 /project-root
     README.md
-    BILINGUAL_GUIDE.md
+    README.ja.md          # 本ファイル（日本語訳）
     /vba
         ProductionKPITool.bas
         UserForm.frm
         Helpers.bas
     /python_app
         app.py
-        i18n.py                    (NEW: Translation module)
         compute_kpis.py
         charts.py
         data_loader.py
         styles.css
-        test_i18n.py              (NEW: Translation test script)
         /data
-            generate_sample_data.py
-            sample_production_data.xlsx (generated via script)
+            sample_production_data.xlsx (generate_sample_data.py で生成)
 ```
 
-Bilingual Features (English + 日本語)
+KPI の計算式（説明）
 
-**New in Version 1.0:**
-- Language selector in sidebar (top) using `st.sidebar.radio()`
-- Instant language switching with automatic UI re-render
-- 40+ translation keys covering all UI elements
-- Bilingual support in:
-  - Page headers and titles
-  - Sidebar labels and filters
-  - KPI card labels
-  - Chart titles and axis labels
-  - Error messages
-  - Export buttons and file names
+- 総生産量（Total Output）: フィルターされたレコードの `Output` の合計。
+- 不良率（Defect Rate）: 総不良数 / 総生産量（パーセンテージ表示）。
+- 設備稼働率（Machine Utilization）: 100 - (総ダウンタイム分数 / (シフト分数 * シフト数)) * 100。
+  - `shift_minutes` はデフォルトで 480 分（8 時間）を想定。
+  - `shifts` はフィルタ済みデータの行数（各行がシフト単位の記録である想定）で近似。
+- 効率スコア（Efficiency Score）: Output / (Output + Defects)
 
-**Translation Module (`i18n.py`):**
-- Centralized translation dictionary
-- Simple `t(key, lang)` function for retrieving translations
-- Easy to extend with new languages
+ユースケース（製造業向け）
 
-**How to test bilingual features:**
-```powershell
-cd python_app
-python test_i18n.py       # Verify translations
-streamlit run app.py      # Launch app and switch language in sidebar
-```
+このダッシュボードは生産管理者や品質管理担当者向けで、次の用途を想定しています：
 
-**For detailed bilingual implementation guide, see: `BILINGUAL_GUIDE.md`**
+- 機械やシフトごとの日次生産量の監視
+- 不良トレンドの追跡と問題機械の特定
+- ダウンタイムによる稼働時間ロスの推定
+- KPI サマリをエクスポートして報告・会計へ連携
 
-KPI formulas explanation
+セットアップおよび開発ノート
 
-- Total Output: Sum of `Output` over filtered records.
-- Defect Rate: Total Defects / Total Output (shown as percentage).
-- Machine Utilization: 100 - (Total DowntimeMinutes / (shift_minutes * shifts)) * 100.
-  - `shift_minutes` is assumed to be 480 (8-hour shift) by default.
-  - `shifts` approximated by number of rows in the filtered data.
-- Efficiency Score: Output / (Output + Defects)
+- Python アプリはモジュール化されています: `data_loader.py`, `compute_kpis.py`, `charts.py`。
+- スタイルは `python_app/styles.css` にまとめられ、Streamlit 実行時に注入されます。
+- サンプルデータ生成スクリプト `python_app/data/generate_sample_data.py` を実行すると、現実的なサンプルデータが作成されます。
 
-Use-case scenario
+今後の改善案
 
-This dashboard is intended for production managers and quality engineers to:
+- ユーザー認証とロールベースのアクセス制御の追加
+- データをデータベースに永続化し、履歴比較を可能にする機能
+- シフト表に基づくより正確な稼働率計算
+- インタラクティブなチャート（Plotly）やドリルダウン機能の追加
+- KPI 計算ロジックのユニットテスト追加
 
-- Monitor daily production output across machines and shifts
-- Track defect trends and identify problem machines
-- Estimate utilization (time lost due to downtime)
-- Export KPI summaries for reporting and accounting
+ライセンス
 
-Setup & Development notes
+MIT License
 
-- The Python app is modular: `data_loader.py`, `compute_kpis.py`, and `charts.py`.
-- Styles are in `python_app/styles.css` and injected into Streamlit at runtime.
-- The sample data generator `python_app/data/generate_sample_data.py` creates a realistic dataset.
+---
 
-Future improvements
-
-- Add user authentication and role-based access
-- Persist data to a database and add historical comparisons
-- More advanced utilization calculation using shift schedules
-- Add interactive charting (Plotly) and drill-downs
-- Add unit tests for KPI calculations
-
-
+ご不明点や追加の翻訳要望があれば教えてください。
