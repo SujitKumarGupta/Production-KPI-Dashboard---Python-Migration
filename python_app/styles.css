@@ -1,0 +1,29 @@
+/* styles.css - custom styles for Streamlit app */
+:root{
+  --card-bg: #ffffff;
+  --card-border: #e6eef8;
+  --primary: #0b5cff;
+  --muted: #6c7a89;
+}
+
+.kpi-card{
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(11,92,255,0.08);
+  background: var(--card-bg);
+  padding: 12px 16px;
+  border: 1px solid var(--card-border);
+}
+
+.kpi-value{
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.kpi-label{ color: var(--muted); font-size: 12px }
+
+/* compact sidebar */
+[aria-label="Main menu"]{ width: 260px }
+
+/* responsive chart container mimic */
+.chart-container{ padding: 8px; background: #fff; border-radius: 6px; border: 1px solid #eef3f8 }
